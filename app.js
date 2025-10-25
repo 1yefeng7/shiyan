@@ -116,22 +116,27 @@ const elements = {
   mapCanvas: document.getElementById("map-canvas"),
 };
 
+function showPage(target) {
+  if (!target) return;
+  state.currentPage = target;
+  elements.navButtons.forEach((btn) => btn.classList.toggle("active", btn.dataset.target === target));
+  elements.pages.forEach((page) => page.classList.toggle("active", page.id === target));
+
+  if (target === "overview") {
+    drawFarmMap();
+  }
+  if (target === "data") {
+    renderDataCharts();
+  }
+  if (target === "community" && !elements.communityMap.hidden) {
+    drawCommunityMap();
+  }
+}
+
 function initNavigation() {
   elements.navButtons.forEach((button) => {
     button.addEventListener("click", () => {
-      const target = button.dataset.target;
-      state.currentPage = target;
-      elements.navButtons.forEach((btn) => btn.classList.toggle("active", btn === button));
-      elements.pages.forEach((page) => page.classList.toggle("active", page.id === target));
-      if (target === "overview") {
-        drawFarmMap();
-      }
-      if (target === "data") {
-        renderDataCharts();
-      }
-      if (target === "community" && !elements.communityMap.hidden) {
-        drawCommunityMap();
-      }
+      showPage(button.dataset.target);
     });
   });
 }
@@ -147,6 +152,7 @@ function initLogin() {
     state.user = { username, phone, loggedInAt: new Date().toISOString() };
     localStorage.setItem("xssy-user", JSON.stringify(state.user));
     updateLoginStatus();
+    showPage("overview");
   });
 }
 
