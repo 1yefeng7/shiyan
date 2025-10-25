@@ -3,12 +3,12 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>小树少游功能演示</title>
+    <title>小优小游功能演示</title>
     <link rel="stylesheet" href="styles.css" />
   </head>
   <body>
     <nav class="top-nav">
-      <h1 class="app-title">小树少游功能演示</h1>
+      <h1 class="app-title">小优小游功能演示</h1>
       <ul class="nav-links">
         <li><button data-target="login" class="nav-button active">登录</button></li>
         <li><button data-target="overview" class="nav-button">田园概览</button></li>
@@ -22,7 +22,7 @@
     <main>
       <section id="login" class="page active">
         <div class="panel">
-          <h2>Welcome to 小树少游!</h2>
+          <h2>Welcome to 小优小游!</h2>
           <p>登录以解锁个性化的田园旅行体验。</p>
           <form id="login-form" class="login-form">
             <label>
@@ -31,7 +31,7 @@
             </label>
             <label>
               手机号
-              <input type="tel" id="phone" required pattern="^1[3-9]\\d{9}$" placeholder="请输入手机号" />
+              <input type="tel" id="phone" required pattern="^1[3-9]\d{9}$" placeholder="请输入手机号" />
             </label>
             <button type="submit" class="primary">开启旅程</button>
           </form>
@@ -183,6 +183,6 @@
       </article>
     </template>
 
-    <script src="app.js" type="module"></script>
+    <script src="app.js" defer></script>
   </body>
 </html>
