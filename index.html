@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>小优小游功能演示</title>
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <nav class="top-nav">
+      <h1 class="app-title">小优小游功能演示</h1>
+      <ul class="nav-links">
+        <li><button data-target="login" class="nav-button active">登录</button></li>
+        <li><button data-target="overview" class="nav-button">田园概览</button></li>
+        <li><button data-target="preparation" class="nav-button">出行准备</button></li>
+        <li><button data-target="explore" class="nav-button">探索世界</button></li>
+        <li><button data-target="data" class="nav-button">数据看板</button></li>
+        <li><button data-target="community" class="nav-button">社区互动</button></li>
+      </ul>
+    </nav>
+
+    <main>
+      <section id="login" class="page active">
+        <div class="panel">
+          <h2>Welcome to 小优小游!</h2>
+          <p>登录以解锁个性化的田园旅行体验。</p>
+          <form id="login-form" class="login-form">
+            <label>
+              用户名
+              <input type="text" id="username" required placeholder="请输入用户名" />
+            </label>
+            <label>
+              手机号
+              <input type="tel" id="phone" required pattern="^1[3-9]\\d{9}$" placeholder="请输入手机号" />
+            </label>
+            <button type="submit" class="primary">开启旅程</button>
+          </form>
+          <p id="login-status" class="status"></p>
+        </div>
+      </section>
+
+      <section id="overview" class="page">
+        <div class="panel">
+          <header class="page-header">
+            <h2>田园生态概览</h2>
+            <div class="weather" id="weather-info">
+              <span>天气加载中...</span>
+            </div>
+          </header>
+          <div class="overview-content">
+            <div class="info-card">
+              <h3>今日亮点</h3>
+              <ul id="highlight-list"></ul>
+            </div>
+            <div class="info-card">
+              <h3>推荐路线</h3>
+              <ol id="route-list"></ol>
+            </div>
+            <div class="info-card">
+              <h3>田园地图概况</h3>
+              <canvas id="farm-map" width="320" height="240" aria-label="田园示意图"></canvas>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section id="preparation" class="page">
+        <div class="panel">
+          <header class="page-header">
+            <h2>出行准备中心</h2>
+            <span id="countdown"></span>
+          </header>
+          <div class="preparation-content">
+            <div class="checklist">
+              <h3>准备清单</h3>
+              <ul id="checklist"></ul>
+            </div>
+            <div class="packing">
+              <h3>智能行李助手</h3>
+              <form id="packing-form">
+                <label>
+                  添加物品
+                  <input type="text" id="packing-input" placeholder="例如：户外帽子" required />
+                </label>
+                <button type="submit" class="primary">添加</button>
+              </form>
+              <ul id="packing-list" class="tag-list"></ul>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section id="explore" class="page">
+        <div class="panel">
+          <header class="page-header">
+            <h2>You Meet The World</h2>
+            <div class="filters">
+              <label>
+                主题
+                <select id="theme-filter"></select>
+              </label>
+              <label>
+                搜索
+                <input type="search" id="search-input" placeholder="输入关键词" />
+              </label>
+            </div>
+          </header>
+          <div id="destination-grid" class="card-grid" aria-live="polite"></div>
+        </div>
+      </section>
+
+      <section id="data" class="page">
+        <div class="panel">
+          <header class="page-header">
+            <h2>数据洞察看板</h2>
+            <div class="data-actions">
+              <button id="refresh-data" class="secondary">刷新数据</button>
+            </div>
+          </header>
+          <div class="charts">
+            <div class="chart-card">
+              <h3>游客来源构成</h3>
+              <canvas id="origin-chart" width="320" height="240"></canvas>
+            </div>
+            <div class="chart-card">
+              <h3>满意度趋势</h3>
+              <canvas id="satisfaction-chart" width="320" height="240"></canvas>
+            </div>
+            <div class="chart-card">
+              <h3>热度指数</h3>
+              <div id="heat-score" class="heat-score">--</div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section id="community" class="page">
+        <div class="panel">
+          <header class="page-header">
+            <h2>社区互动中心</h2>
+            <div class="community-actions">
+              <button id="toggle-map" class="secondary">显示互动地图</button>
+            </div>
+          </header>
+          <div class="community-content">
+            <div class="feedback">
+              <h3>留言墙</h3>
+              <form id="feedback-form">
+                <label>
+                  昵称
+                  <input type="text" id="feedback-name" placeholder="游客昵称" required />
+                </label>
+                <label>
+                  留言
+                  <textarea id="feedback-message" rows="3" placeholder="分享你的田园故事" required></textarea>
+                </label>
+                <button type="submit" class="primary">发布</button>
+              </form>
+              <ul id="feedback-list" class="feedback-list"></ul>
+            </div>
+            <div class="events">
+              <h3>活动日程</h3>
+              <ul id="event-list" class="timeline"></ul>
+            </div>
+            <div class="map" id="community-map" hidden>
+              <h3>互动足迹地图</h3>
+              <canvas id="map-canvas" width="320" height="240"></canvas>
+            </div>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <template id="destination-card-template">
+      <article class="card">
+        <img alt="" class="card-image" />
+        <div class="card-content">
+          <h3 class="card-title"></h3>
+          <p class="card-description"></p>
+          <ul class="tag-list card-tags"></ul>
+        </div>
+        <button class="secondary card-action">收藏</button>
+      </article>
+    </template>
+
+    <script src="app.js" type="module"></script>
+  </body>
+</html>
