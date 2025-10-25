@@ -1,19 +1,59 @@
+const STORAGE_KEYS = {
+  user: "xyxy-user",
+  packing: "xyxy-packing",
+  favorites: "xyxy-favorites",
+  feedback: "xyxy-feedback",
+};
+
+const LEGACY_KEYS = {
+  user: "xssy-user",
+  packing: "xssy-packing",
+  favorites: "xssy-favorites",
+  feedback: "xssy-feedback",
+};
+
+function safeParse(value) {
+  if (!value) return undefined;
+  try {
+    return JSON.parse(value);
+  } catch (error) {
+    console.warn("无法解析存储的数据，将使用默认值", error);
+    return undefined;
+  }
+}
+
+function readFromStorage(key) {
+  const modern = safeParse(localStorage.getItem(STORAGE_KEYS[key]));
+  if (modern !== undefined) {
+    return modern;
+  }
+
+  const legacyKey = LEGACY_KEYS[key];
+  if (!legacyKey) return undefined;
+
+  const legacy = safeParse(localStorage.getItem(legacyKey));
+  if (legacy !== undefined) {
+    localStorage.setItem(STORAGE_KEYS[key], JSON.stringify(legacy));
+    localStorage.removeItem(legacyKey);
+    return legacy;
+  }
+
+  return undefined;
+}
+
 const state = {
   currentPage: "login",
-  user: JSON.parse(localStorage.getItem("xssy-user")) ?? null,
+  user: readFromStorage("user") ?? null,
   checklist: [
     { id: 1, label: "确认行程信息", done: false },
     { id: 2, label: "完成健康申报", done: false },
     { id: 3, label: "准备环保出游装备", done: false },
     { id: 4, label: "预约农场体验项目", done: false },
   ],
-  packingItems: JSON.parse(localStorage.getItem("xssy-packing")) ?? [
-    "舒适运动鞋",
-    "遮阳帽",
-    "随身水杯",
-  ],
-  favorites: new Set(JSON.parse(localStorage.getItem("xssy-favorites")) ?? []),
-  feedback: JSON.parse(localStorage.getItem("xssy-feedback")) ?? [],
+  packingItems:
+    readFromStorage("packing") ?? ["舒适运动鞋", "遮阳帽", "随身水杯"],
+  favorites: new Set(readFromStorage("favorites") ?? []),
+  feedback: readFromStorage("feedback") ?? [],
 };
 
 const highlights = [
@@ -116,22 +156,45 @@ const elements = {
   mapCanvas: document.getElementById("map-canvas"),
 };
 
+function navigateTo(target, options = {}) {
+  const { force = false } = options;
+  let finalTarget = target;
+
+  if (!force && !state.user && target !== "login") {
+    finalTarget = "login";
+    if (elements.loginStatus) {
+      elements.loginStatus.textContent = "请先登录以体验小优小游的完整功能。";
+    }
+  }
+
+  state.currentPage = finalTarget;
+  elements.navButtons.forEach((button) => {
+    button.classList.toggle("active", button.dataset.target === finalTarget);
+  });
+  elements.pages.forEach((page) => {
+    const isActive = page.id === finalTarget;
+    page.classList.toggle("active", isActive);
+    if (isActive) {
+      page.focus?.();
+    }
+  });
+
+  if (finalTarget === "overview") {
+    drawFarmMap();
+  }
+  if (finalTarget === "data") {
+    renderDataCharts();
+  }
+  if (finalTarget === "community" && !elements.communityMap.hidden) {
+    drawCommunityMap();
+  }
+}
+
 function initNavigation() {
   elements.navButtons.forEach((button) => {
     button.addEventListener("click", () => {
       const target = button.dataset.target;
-      state.currentPage = target;
-      elements.navButtons.forEach((btn) => btn.classList.toggle("active", btn === button));
-      elements.pages.forEach((page) => page.classList.toggle("active", page.id === target));
-      if (target === "overview") {
-        drawFarmMap();
-      }
-      if (target === "data") {
-        renderDataCharts();
-      }
-      if (target === "community" && !elements.communityMap.hidden) {
-        drawCommunityMap();
-      }
+      navigateTo(target);
     });
   });
 }
@@ -145,14 +208,15 @@ function initLogin() {
     if (!username || !phone) return;
 
     state.user = { username, phone, loggedInAt: new Date().toISOString() };
-    localStorage.setItem("xssy-user", JSON.stringify(state.user));
+    localStorage.setItem(STORAGE_KEYS.user, JSON.stringify(state.user));
     updateLoginStatus();
+    navigateTo("overview", { force: true });
   });
 }
 
 function updateLoginStatus() {
   if (state.user) {
-    elements.loginStatus.textContent = `欢迎回来，${state.user.username}！点击上方导航继续探索。`;
+    elements.loginStatus.textContent = `欢迎回来，${state.user.username}！小优小游已经为你准备好旅程。`;
   } else {
     elements.loginStatus.textContent = "尚未登录";
   }
@@ -255,7 +319,7 @@ function renderChecklist() {
 }
 
 function persistPacking() {
-  localStorage.setItem("xssy-packing", JSON.stringify(state.packingItems));
+  localStorage.setItem(STORAGE_KEYS.packing, JSON.stringify(state.packingItems));
 }
 
 function renderPackingList() {
@@ -347,7 +411,10 @@ function renderDestinationCards() {
       } else {
         state.favorites.add(destination.id);
       }
-      localStorage.setItem("xssy-favorites", JSON.stringify([...state.favorites]));
+      localStorage.setItem(
+        STORAGE_KEYS.favorites,
+        JSON.stringify([...state.favorites])
+      );
       updateFavoriteButton(action, !currentlyFavorite);
     });
 
@@ -498,7 +565,7 @@ function initCommunity() {
       time: new Date().toLocaleString(),
     };
     state.feedback.unshift(entry);
-    localStorage.setItem("xssy-feedback", JSON.stringify(state.feedback));
+    localStorage.setItem(STORAGE_KEYS.feedback, JSON.stringify(state.feedback));
     elements.feedbackForm.reset();
     renderFeedback();
   });
@@ -567,6 +634,11 @@ function initApp() {
   initExplore();
   initDataBoard();
   initCommunity();
+  if (state.user) {
+    navigateTo("overview", { force: true });
+  } else {
+    navigateTo("login", { force: true });
+  }
 }
 
 initApp();
